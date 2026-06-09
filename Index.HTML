@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For My Favorite Person ❤️</title>
+    <style>
+        :root {
+            --primary-pink: #ff6b8b;
+            --secondary-pink: #ff4757;
+            --bg-lavender: #f7f1e3;
+            --text-dark: #2c3e50;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-lavender);
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Navigation Bar */
+        nav {
+            background-color: white;
+            width: 100%;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: none; /* Hidden until password is correct */
+        }
+
+        nav button {
+            background-color: transparent;
+            border: 2px solid var(--primary-pink);
+            color: var(--primary-pink);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        nav button.active, nav button:hover {
+            background-color: var(--primary-pink);
+            color: white;
+        }
+
+        /* Pages Setup */
+        .page {
+            display: none;
+            max-width: 600px;
+            width: 90%;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1, h2 {
+            color: var(--secondary-pink);
+            margin-bottom: 20px;
+        }
+
+        p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        /* Password Page Styles */
+        .password-input {
+            padding: 12px;
+            font-size: 1.2rem;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 200px;
+            text-align: center;
+            margin-bottom: 15px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .password-input:focus {
+            border-color: var(--primary-pink);
+        }
+        .lock-btn {
+            background-color: var(--primary-pink);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(255, 107, 139, 0.4);
+        }
+        #error-msg {
+            color: var(--secondary-pink);
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        /* Home Page Unlock Button */
+        .unlock-btn {
+            background-color: #2ed573;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 4px 10px rgba(46, 213, 115, 0.4);
+            transition: transform 0.2s;
+        }
+        .unlock-btn:hover { transform: scale(1.05); }
+
+        /* Game Page Elements */
+        #game-container {
+            width: 100%;
+            height: 300px;
+            background-color: #ffeaa7;
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 20px;
+            border: 3px dashed var(--primary-pink);
+        }
+
+        #heart-target {
+            font-size: 30px;
+            position: absolute;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.1s ease;
+        }
+
+        /* Love Letter Styles */
+        .love-paragraph {
+            text-align: left;
+            text-indent: 20px;
+            font-style: italic;
+            border-left: 4px solid var(--primary-pink);
+            padding-left: 15px;
+        }
+
+        /* Proposal Question Elements */
+        .quiz-container {
+            margin-top: 30px;
+            position: relative;
+            min-height: 150px;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .quiz-btn {
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            border: none;
+            font-weight: bold;
+        }
+
+        #yes-btn {
+            background-color: var(--secondary-pink);
+            color: white;
+            box-shadow: 0 4px 10px rgba(255, 71, 87, 0.4);
+        }
+
+        #no-btn {
+            background-color: #a4b0be;
+            color: white;
+            position: relative;
+        }
+
+        #emoji-display {
+            font-size: 3rem;
+            margin-top: 15px;
+            height: 60px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation (Revealed after entering correct password) -->
+    <nav id="main-nav">
+        <button onclick="showPage('home')" id="nav-home" class="active">Welcome</button>
+        <button onclick="showPage('apology')" id="nav-apology" style="display:none;">My Heart</button>
+        <button onclick="showPage('game')" id="nav-game" style="display:none;">Play Me</button>
+        <button onclick="showPage('quiz')" id="nav-quiz" style="display:none;">Question</button>
+    </nav>
+
+    <!-- Page 0: Lock Screen -->
+    <div id="lock-screen" class="page active">
+        <h2>🔒 Private Access Only</h2>
+        <p>This page is encrypted with love. Please enter our special 4-digit date/code to enter.</p>
+        <input type="password" id="password-field" class="password-input" placeholder="••••" maxlength="4">
+        <br>
+        <button class="lock-btn" onclick="checkPassword()">Unlock</button>
+        <p id="error-msg"></p>
+    </div>
+
+    <!-- Page 1: Welcome / Unlock -->
+    <div id="home" class="page">
+        <h1>Hello Beautiful ✨</h1>
+        <p>I made something special just for you to express how truly sorry I am, and to remind you how much you mean to me.</p>
+        <p>Click the button below to unlock everything else inside my heart.</p>
+        <button class="unlock-btn" onclick="unlockSecretPages()">🔓 Unlock the Pages</button>
+    </div>
+
+    <!-- Page 2: Apology & Love Paragraphs -->
+    <div id="apology" class="page">
+        <h2>I am So Sorry... 💔</h2>
+        <p>Before you read any further, I want to sincerely apologize. I never, ever want to be the reason behind your unhappiness. You deserve nothing but absolute joy, warmth, and laughter, and it breaks my heart knowing I fell short of that.</p>
+        
+        <hr style="border: 0; height: 1px; background: #ddd; margin: 20px 0;">
+        
+        <h2>Why You Mean the World to Me</h2>
+        <p class="love-paragraph">From the moment you walked into my life, everything changed for the better. You have this incredible ability to make the darkest days feel bright just by being yourself. Your smile is my absolute favorite sight, and your happiness is my highest priority.</p>
+        <p class="love-paragraph">I love you more than words could ever properly express. I love the way you laugh, the way you think, and the beautiful kindness you radiate. You aren't just my partner; you are my safe haven, my best friend, and my entire world. Please forgive me, and let me make it up to you.</p>
+    </div>
+
+    <!-- Page 3: Mini Game -->
+    <div id="game" class="page">
+        <h2>Catch My Heart! 🏹❤️</h2>
+        <p>Score: <span id="score">0</span>/5 to complete the challenge!</p>
+        <div id="game-container">
+            <div id="heart-target" onclick="scoreHeart()">❤️</div>
+        </div>
+    </div>
+
+    <!-- Page 4: The Loop Question -->
+    <div id="quiz" class="page">
+        <h2>The Ultimate Question 🥺</h2>
+        <p id="quiz-instruction">After everything, I have to know...</p>
+        <h1 id="main-question">Do you still love me?</h1>
+        
+        <div id="emoji-display"></div>
+
+        <div class="quiz-container">
+            <div class="btn-container">
+                <button id="yes-btn" class="quiz-btn" onclick="sayYes()">Yes</button>
+                <button id="no-btn" class="quiz-btn" onmouseover="moveNoButton()" onclick="clickedNo()">No</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Password Check Logic
+        function checkPassword() {
+            const input = document.getElementById('password-field').value;
+            const errorMsg = document.getElementById('error-msg');
+            
+            if (input === '0819') {
+                // Hide lock screen and reveal navigation
+                document.getElementById('lock-screen').classList.remove('active');
+                document.getElementById('main-nav').style.display = 'flex';
+                
+                // Show home page
+                document.getElementById('home').classList.add('active');
+            } else {
+                errorMsg.innerText = "❌ Incorrect code. Hint: A very special date? 🤔";
+                document.getElementById('password-field').value = '';
+            }
+        }
+
+        // Allow pressing 'Enter' key to submit password
+        document.getElementById('password-field').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+
+        // Page Navigation Logic
+        let pagesUnlocked = false;
+
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            // Show target page
+            document.getElementById(pageId).classList.add('active');
+            
+            // Toggle active class on nav buttons
+            document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('nav-' + pageId).classList.add('active');
+
+            // Initialize game if game page is opened
+            if(pageId === 'game') {
+                resetGame();
+            }
+        }
+
+        function unlockSecretPages() {
+            pagesUnlocked = true;
+            document.getElementById('nav-apology').style.display = 'inline-block';
+            document.getElementById('nav-game').style.display = 'inline-block';
+            document.getElementById('nav-quiz').style.display = 'inline-block';
+            alert("Everything unlocked! Please look at the tabs above now. ❤️");
+            showPage('apology');
+        }
+
+        // Mini Game Logic
+        let score = 0;
+        const heart = document.getElementById('heart-target');
+        const container = document.getElementById('game-container');
+
+        function moveHeart() {
+            const maxX = container.clientWidth - 40;
+            const maxY = container.clientHeight - 40;
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+            
+            heart.style.left = randomX + 'px';
+            heart.style.top = randomY + 'px';
+        }
+
+        function scoreHeart() {
+            score++;
+            document.getElementById('score').innerText = score;
+            if(score >= 5) {
+                alert("Yay! You caught my heart! Now you are officially ready for the final page... Go look at the 'Question' tab!");
+                showPage('quiz');
+            } else {
+                moveHeart();
+            }
+        }
+
+        function resetGame() {
+            score = 0;
+            document.getElementById('score').innerText = score;
+            moveHeart();
+        }
+
+        // Quiz Logic
+        const sadEmojis = ["😢", "😭", "🥺", "💔", "🧎‍♂️", "🥀", "😣"];
+        let noClickCount = 0;
+
+        function moveNoButton() {
+            const noBtn = document.getElementById('no-btn');
+            // Move randomly to make it difficult to click
+            const randomX = Math.floor(Math.random() * 120) - 60;
+            const randomY = Math.floor(Math.random() * 120) - 60;
+            noBtn.style.transform = `translate(${randomX}px, ${randomY}px)`;
+            
+            // Display a sad emoji whenever they try to hover/click No
+            triggerSadness();
+        }
+
+        function clickedNo() {
+            triggerSadness();
+        }
+
+        function triggerSadness() {
+            noClickCount++;
+            const emojiDisplay = document.getElementById('emoji-display');
+            const randomEmoji = sadEmojis[Math.floor(Math.random() * sadEmojis.length)];
+            emojiDisplay.innerText = randomEmoji;
+
+            // Make the 'Yes' button bigger every time they attempt to click 'No'
+            const yesBtn = document.getElementById('yes-btn');
+            let currentSize = parseFloat(window.getComputedStyle(yesBtn).fontSize);
+            if (currentSize < 40) { 
+                yesBtn.style.fontSize = (currentSize + 2) + "px";
+                yesBtn.style.padding = "15px " + (40 + noClickCount*5) + "px";
+            }
+        }
+
+        function sayYes() {
+            document.getElementById('main-question').innerText = "I knew it! I love you infinitely more! ❤️🥰🎉";
+            document.getElementById('quiz-instruction').innerText = "Best answer ever!";
+            document.getElementById('emoji-display').innerText = "💖✨👩‍❤️‍👨💒";
+            // Hide buttons
+            document.querySelector('.btn-container').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
